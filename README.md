@@ -60,3 +60,19 @@ Todas las rutas son relativas, por lo que funciona en URLs del tipo:
 - Después del florecimiento hay una explosión de partículas doradas.
 - Quedan luciérnagas/partículas flotando para que la escena siga viva.
 - Se reforzó el resplandor central sin tapar la flor ni el texto.
+
+
+## V5 optimizada para GitHub Pages / móvil
+
+El ZIP sigue siendo 100% estático y compatible con GitHub Pages.
+
+Optimizaciones principales:
+- La flor y los ramos se construyen durante el tiempo ocioso de la pantalla inicial, no al tocar “Sí”.
+- Calidad adaptativa: en móvil se dibujan menos partículas, pero se mantiene el mismo efecto visual.
+- DPR del canvas limitado para evitar renderizar millones de píxeles innecesarios.
+- El efecto pesado de líneas y explosión solo se calcula durante los segundos en que es visible.
+- Después del florecimiento quedan solo partículas ambientales ligeras a ~30 FPS.
+- Menos nodos DOM para semillas y mini-pétalos.
+- Se eliminó `mix-blend-mode` del canvas de pantalla completa.
+- Las imágenes de la prueba se decodifican en segundo plano.
+- Se precalculan valores trigonométricos de los trazos.
