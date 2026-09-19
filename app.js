@@ -16,6 +16,7 @@
 
   let noAttempts = 0;
   let bloomRAF = null;
+  let bloomTimer = null;
   let scenePrepared = false;
   let lastAmbientFrame = 0;
 
@@ -146,8 +147,8 @@
 
   function prepareScene() {
     if (scenePrepared) return;
-    makePetalRing(outerPetals, 26, .08, .026, false);
-    makePetalRing(innerPetals, 22, .44, .023, true);
+    makePetalRing(outerPetals, 26, .04, .021, false);
+    makePetalRing(innerPetals, 22, .36, .019, true);
     makeSeeds();
     makeBouquets();
     scenePrepared = true;
@@ -266,19 +267,19 @@
       const elapsed = now - start;
 
       // After the expensive bloom has finished, render ambience at ~30fps.
-      if (elapsed > 4700 && now - lastAmbientFrame < 33) {
+      if (elapsed > 3300 && now - lastAmbientFrame < 33) {
         bloomRAF = requestAnimationFrame(frame);
         return;
       }
-      if (elapsed > 4700) lastAmbientFrame = now;
+      if (elapsed > 3300) lastAmbientFrame = now;
 
       ctx.clearRect(0, 0, W, H);
       ctx.save();
       ctx.globalCompositeOperation = 'lighter';
 
       // 0–2.15s: procedural traces only while they're actually animating.
-      if (elapsed < 2150) {
-        const traceP = easeOut(elapsed / 1900);
+      if (elapsed < 1350) {
+        const traceP = easeOut(elapsed / 1150);
 
         for (let i = 0; i < traces.length; i++) {
           const tr = traces[i];
@@ -308,8 +309,8 @@
       }
 
       // 0.25–2.65s: particles spiral inward.
-      if (elapsed > 250 && elapsed < 2700) {
-        const gather = easeInOut((elapsed - 250) / 2100);
+      if (elapsed > 120 && elapsed < 1650) {
+        const gather = easeInOut((elapsed - 120) / 1250);
 
         for (let i = 0; i < particles.length; i++) {
           const p = particles[i];
@@ -326,8 +327,8 @@
       }
 
       // 2.15–4s: one outward burst. It stops completely afterwards.
-      if (elapsed > 2150 && elapsed < 4000) {
-        const burst = easeOut((elapsed - 2150) / 1650);
+      if (elapsed > 1200 && elapsed < 3000) {
+        const burst = easeOut((elapsed - 1200) / 1450);
         const fade = 1 - clamp01((burst - .48) / .52);
 
         if (fade > 0) {
@@ -359,15 +360,15 @@
       }
 
       // 1.75–3s: cached central glow.
-      if (elapsed > 1750 && elapsed < 3000) {
-        const flash = Math.sin(clamp01((elapsed - 1750) / 1250) * Math.PI);
+      if (elapsed > 950 && elapsed < 2050) {
+        const flash = Math.sin(clamp01((elapsed - 950) / 1100) * Math.PI);
         ctx.globalAlpha = flash;
         ctx.fillStyle = glow;
         ctx.fillRect(0, 0, W, H);
       }
 
       // From 3s onward: cheap ambient sparks only.
-      if (elapsed > 3000) {
+      if (elapsed > 2400) {
         for (let i = 0; i < fireflies.length; i++) {
           const f = fireflies[i];
           const driftX = Math.sin(elapsed * .00045 * f.drift + f.phase) * 12;
@@ -423,16 +424,24 @@
     // Paint the screen immediately; start the expensive FX on the next frame.
     requestAnimationFrame(() => {
       surprise.classList.add('is-running');
-      requestAnimationFrame(startBloomFX);
+
+      // First let the flower bloom cleanly.
+      // Only after it is readable do the particles/lines celebrate around it.
+      clearTimeout(bloomTimer);
+      bloomTimer = setTimeout(() => {
+        requestAnimationFrame(startBloomFX);
+      }, 1850);
     });
   });
 
   continueBtn.addEventListener('click', () => {
+    clearTimeout(bloomTimer);
     cancelAnimationFrame(bloomRAF);
     surprise.classList.add('show-proof');
   });
 
   restartBtn.addEventListener('click', () => {
+    clearTimeout(bloomTimer);
     cancelAnimationFrame(bloomRAF);
     surprise.classList.remove('show-proof', 'is-running');
     noAttempts = 0;

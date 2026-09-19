@@ -76,3 +76,18 @@ Optimizaciones principales:
 - Se eliminó `mix-blend-mode` del canvas de pantalla completa.
 - Las imágenes de la prueba se decodifican en segundo plano.
 - Se precalculan valores trigonométricos de los trazos.
+
+
+## V6 — secuencia corregida
+
+El flujo ahora se divide en beats claros:
+
+1. Al pulsar Sí, primero florece la flor central sin partículas compitiendo con ella.
+2. Aparece el centro/semillas.
+3. Entra el texto de Six Flags.
+4. Después comienza el efecto procedural de líneas + partículas.
+5. La celebración de partículas explota alrededor de la flor ya terminada.
+6. Luego entran los ramos laterales y la montaña rusa.
+7. Finalmente aparece “Ver la prueba”.
+
+Además de verse más claro, esto reparte el trabajo de renderizado en el tiempo y evita ejecutar flor + partículas + ramos + montaña rusa en el mismo instante.
